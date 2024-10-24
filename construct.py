@@ -603,7 +603,7 @@ if 'editing_class' not in st.session_state:
 st.header("HTML constructor")
 
 # adding buttons
-with st.container():
+with st.container(border=True):
     col1, col2, col3, col4, space, entername, col5, col6, col7 = st.columns([1.2, 1.4, 1.4, 2.4, 3, 1.4, 2.3, 0.9, 1])
     add_text = col1.button("Add text")
     add_image = col2.button("Add image")
@@ -640,7 +640,7 @@ with st.container():
     explorer, scene, inspector = st.columns([2, 6, 3], gap="medium")
     # a field with all classes in proj
     with explorer:
-        with st.container(height=685,  ):
+        with st.container(height=685, border=True):
             st.subheader("Explorer")
             with st.container(height=480, border=False):
                 for i, label in enumerate(classes):
@@ -667,12 +667,12 @@ with st.container():
                     delete = delete.button("Delete")
     # page
     with scene:
-        with st.container(height=685,  ):
+        with st.container(height=685, border=True):
             components.html(st.session_state.input_page, height=645, scrolling=True)
 
     # form with element's parameters
     with inspector:
-        with st.container(height=685,  ):
+        with st.container(height=685, border=True):
             if not st.session_state.choose_element:
                 st.subheader(st.session_state.header)
                 if st.session_state.type == 'text':
@@ -874,7 +874,7 @@ with st.container():
                             st.session_state.input_page = add_in_group(st.session_state.input_page, st.session_state.preclass, new_class, type_select)
                         st.rerun()
 
-    
+
 
                 if st.session_state.type == 'image':
                     submit = st.button("Submit", disabled=not is_image_url(image_url))
@@ -896,7 +896,7 @@ with st.container():
             else:
                 if not st.session_state.not_working and st.session_state.custom_elements is not None:
                     for i in range(1, len(st.session_state.custom_elements) + 1):
-                        with st.container():
+                        with st.container(border=True):
                             new_class, html, css = create_ready_class(st.session_state.custom_elements[i - 1]['type'],
                                                                       st.session_state.custom_elements[i - 1][
                                                                           'html_content'],
