@@ -640,9 +640,9 @@ with st.container():
     explorer, scene, inspector = st.columns([2, 6, 3], gap="medium")
     # a field with all classes in proj
     with explorer:
-        with st.container(height=685  ):
+        with st.container():
             st.subheader("Explorer")
-            with st.container(height=480, border=False):
+            with st.container():
                 for i, label in enumerate(classes):
                     if st.button(label, key=label):
                         st.session_state.button_pressed = label
@@ -667,12 +667,12 @@ with st.container():
                     delete = delete.button("Delete")
     # page
     with scene:
-        with st.container(height=685  ):
+        with st.container():
             components.html(st.session_state.input_page, height=645, scrolling=True)
 
     # form with element's parameters
     with inspector:
-        with st.container(height=685  ):
+        with st.container():
             if not st.session_state.choose_element:
                 st.subheader(st.session_state.header)
                 if st.session_state.type == 'text':
@@ -896,7 +896,7 @@ with st.container():
             else:
                 if not st.session_state.not_working and st.session_state.custom_elements is not None:
                     for i in range(1, len(st.session_state.custom_elements) + 1):
-                        with st.container(  ):
+                        with st.container():
                             new_class, html, css = create_ready_class(st.session_state.custom_elements[i - 1]['type'],
                                                                       st.session_state.custom_elements[i - 1][
                                                                           'html_content'],
