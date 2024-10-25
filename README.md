@@ -1,4 +1,6 @@
 # WebWizz
+## Check out live demo:
+https://webwizz.streamlit.app/
 ## Used resources
 - https://huggingface.co/
 - https://streamlit.io/
