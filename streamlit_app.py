@@ -16,8 +16,9 @@ if 'account_id' not in st.session_state:
     st.session_state.account_id = ""
 if 'change' not in st.session_state:
     st.session_state.change = True
-st.session_state["hf_token"] = st.secrets.hf_token
-st.session_state["px_token"] = st.secrets.px_token
+
+st.session_state["hf_token"] = st.secrets["hf_token"]
+st.session_state["px_token"] = st.secrets["px_token"]
 
 # Define paths to the pages
 PAGE_PATHS = {
@@ -30,17 +31,34 @@ PAGE_PATHS = {
 }
 
 def load_page(path):
-    with open(path, 'r') as file:
-        page_code = file.read()
-    exec(page_code, globals())
+    if path:
+        with open(path, 'r') as file:
+            page_code = file.read()
+        exec(page_code, globals())
 
 def main():
     st.sidebar.title('Navigation')
-    selection = st.sidebar.radio("Pages: ", list(PAGE_PATHS.keys()))
+    selection = st.sidebar.radio("Pages:", list(PAGE_PATHS.keys()))
 
-    # Load and display the selected page
-    page_path = PAGE_PATHS[selection]
-    load_page(page_path)
+    # Custom CSS styles for selected and non-selected options
+    for key in PAGE_PATHS.keys():
+        color = '#FF4B4B' if key == selection else 'inherit'
+        style = f"""
+        <style>
+            div[role='radiogroup'] > label > div:first-of-type {{
+                display: none;
+            }}
+            div[role='radiogroup'] > label:has(input[value='{key}']) {{
+                color: {color} !important;
+                cursor: pointer;
+            }}
+        </style>
+        """
+        st.markdown(style, unsafe_allow_html=True)
+
+    if selection:  # Only load page if an option is selected
+        page_path = PAGE_PATHS[selection]
+        load_page(page_path)
 
 if __name__ == "__main__":
     main()
