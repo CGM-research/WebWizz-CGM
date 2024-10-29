@@ -1,6 +1,6 @@
 streamlit_code_editor
 streamlit==1.38.0
-bs4
+pip install beautifulsoup4
 bcrypt
 Pillow
 requests
