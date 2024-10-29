@@ -1,6 +1,6 @@
 import random
 import os
-from bs4 import beautifulsoup
+from bs4 import BeautifulSoup
 
 def format_html(html_code):
     soup = BeautifulSoup(html_code, 'html.parser')
