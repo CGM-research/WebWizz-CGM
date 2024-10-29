@@ -1,7 +1,5 @@
 streamlit_code_editor
 streamlit==1.38.0
-beautifulsoup4
-BS4
 bcrypt
 Pillow
 requests
