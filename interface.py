@@ -29,7 +29,8 @@ def replace_text(old_text, new_text):
         else:
             print(f"The text '{old_text}' was not found in the file '{path}' - FATAL ERROR")
 
-st.title("Welcome to our open-source Website generation engine")
+st.title("Generate websites with ease !")
+st.write("An open-source Website generation engine")
 if st.session_state["hf_token"] == "" or st.session_state["px_token"] == "":
     st.warning("Make sure to configure your keys")
 
