@@ -3,5 +3,6 @@ streamlit==1.38.0
 bcrypt
 Pillow
 requests
-bs4==0.0.2
+bs4
+BS4
 beautifulsoup4==4.12.3
