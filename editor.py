@@ -56,7 +56,7 @@ mode_list = ["abap", "abc", "actionscript", "ada", "alda", "apache_conf", "apex"
 
 btns = custom_buttons_alt
 
-st.title("VerstkEdit")
+st.title("Welcome to our WebIDE !")
 st.markdown("A simple website editor")
 
 upload, load = st.columns([3, 3])
