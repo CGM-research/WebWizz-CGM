@@ -3,3 +3,4 @@ streamlit==1.38.0
 bcrypt
 Pillow
 requests
+bs4
