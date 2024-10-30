@@ -642,7 +642,7 @@ with st.container():
     with explorer:
         with st.container(height=685, border=True):
             st.subheader("Explorer")
-            with st.container(height=480, border=False):
+            with st.container(height=400, border=False):
                 for i, label in enumerate(classes):
                     if st.button(label, key=label):
                         st.session_state.button_pressed = label
