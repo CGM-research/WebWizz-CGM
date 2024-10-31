@@ -73,6 +73,13 @@ def main():
 
     # Display selected page name
     print(PAGE_PATHS[selection])
+    
+    st.sidebar.divider()
+    # New sidebar section code starts here
+    
+    st.sidebar.title("Guides")
+    st.sidebar.link_button(label="User manual (UK/US)", url="https://github.com/Wafflelover404/WebWizz/blob/main/guides/en.md")
+    st.sidebar.link_button(label="Руководство (RU)", url="https://github.com/Wafflelover404/WebWizz/blob/main/guides/ru.md")
 
     # Load and display the selected page
     page_path = PAGE_PATHS[selection]
