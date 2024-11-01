@@ -84,8 +84,8 @@ def main():
     # New sidebar section code starts here
     
     st.sidebar.title("Guides")
-    st.sidebar.link_button(label="User manual (UK/US)", url="https://github.com/Wafflelover404/WebWizz/blob/main/ExtraFiles/guides/en.md")
-    st.sidebar.link_button(label="Руководство (RU)", url="https://github.com/Wafflelover404/WebWizz/blob/main/ExtraFiles/guides/ru.md")
+    st.sidebar.link_button(label="User manual (🇬🇧)", url="https://github.com/Wafflelover404/WebWizz/blob/main/ExtraFiles/guides/en.md")
+    st.sidebar.link_button(label="Руководство (🇷🇺)", url="https://github.com/Wafflelover404/WebWizz/blob/main/ExtraFiles/guides/ru.md")
 
     # Load and display the selected page
     page_path = PAGE_PATHS[selection]
