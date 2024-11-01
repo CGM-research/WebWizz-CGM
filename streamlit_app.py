@@ -1,3 +1,9 @@
+import pip
+
+pip.__main__([
+'intall',
+    'beautifulsoup4'])
+
 import streamlit as st
 
 st.set_page_config(layout="wide")
