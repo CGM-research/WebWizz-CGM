@@ -1,7 +1,7 @@
 import pip
 
 pip.main([
-'intall',
+'install',
     'beautifulsoup4'])
 
 import streamlit as st
