@@ -1,6 +1,6 @@
 import pip
 
-pip.__main__([
+pip.main([
 'intall',
     'beautifulsoup4'])
 
