@@ -1,10 +1,19 @@
 import random
 import os
-from bs4 import BeautifulSoup
 
 def format_html(html_code):
-    soup = BeautifulSoup(html_code, 'html.parser')
-    return soup.prettify()
+    # Simple HTML formatting by adding indentation
+    lines = html_code.splitlines()
+    formatted_lines = []
+    indent_level = 0
+    for line in lines:
+        stripped_line = line.strip()
+        if stripped_line.startswith("</"):
+            indent_level -= 1
+        formatted_lines.append("    " * indent_level + stripped_line)
+        if not stripped_line.startswith("</") and not stripped_line.endswith("/>") and stripped_line.endswith(">"):
+            indent_level += 1
+    return "\n".join(formatted_lines)
 
 def count_folders(directory):
     folder_list = [f for f in os.listdir(directory) if os.path.isdir(os.path.join(directory, f))]
@@ -13,11 +22,14 @@ def count_folders(directory):
 def parse_tag(path, tag):
     with open(path, "r") as path_content:
         content = path_content.read()
-        soup = BeautifulSoup(content, 'html.parser')
-        tag_content = soup.find(tag)
+        tag_start = f"<{tag}>"
+        tag_end = f"</{tag}>"
         
-        if tag_content:
-            return str(tag_content)
+        start_index = content.find(tag_start)
+        end_index = content.find(tag_end)
+        
+        if start_index != -1 and end_index != -1:
+            return content[start_index:end_index + len(tag_end)]
         else:
             print(f"No <{tag}> tag found in {path}")
             return ""
