@@ -1,4 +1,4 @@
-# User Guide for WebWizz
+# User manual for WebWizz
 
 ## Introduction
 WebWizz is a web service designed for creating and editing web pages using artificial intelligence. The service provides tools for generating, constructing, and editing HTML code, as well as managing files and configuring settings. WebWizz is open-source on GitHub (License: GNU-GPL 3.0).
