@@ -5,11 +5,123 @@ import os
 import json
 import bcrypt
 
+# Define translations
+translations = {
+    'en': {
+        'authentication': "Authentication",
+        'create_new_account': "Create new account",
+        'login_existing_account': "Login to existing account",
+        'create_unique_username': "Create a unique username",
+        'create_password': "Create a password",
+        'password_short_warning': "Your password is shorter than 8 symbols.",
+        'create_account_button': "Create account",
+        'username_occupied_error': "The username is occupied.",
+        'account_created_success': "Account created successfully!",
+        'provide_username_password_error': "Please provide both a username and a password.",
+        'username': "Username",
+        'password': "Password",
+        'login_button': "Login",
+        'logged_in_success': "Logged in successfully!",
+        'invalid_username_password_error': "Invalid username or password.",
+        'my_projects': "My projects",
+        'current_account': "Current account: {account}",
+        'add_files_manually': "Add files manually",
+        'upload_file': "Upload file",
+        'write_file_manually': "Write file manually",
+        'upload_your_html_file': "Upload your html file here.",
+        'uploaded_file_name': "Uploaded file name: {filename}",
+        'file_content': "File content:",
+        'add_to_database': "Add to database",
+        'enter_data_manually': "Enter data manually.",
+        'filename': "Filename",
+        'content': "Content",
+        'existing_projects': "Existing projects",
+        'no_files_found': "No files found for this user.",
+        'export': "Export",
+        'download_started': "Download started !",
+        'edit': "Edit",
+        'open_in_code_editor': "Open this file in code editor",
+        'opened_in_web_editor': "Opened in Web Editor !"
+    },
+    'ru': {
+        'authentication': "Аутентификация",
+        'create_new_account': "Создать новый аккаунт",
+        'login_existing_account': "Войти в существующий аккаунт",
+        'create_unique_username': "Создайте уникальное имя пользователя",
+        'create_password': "Создайте пароль",
+        'password_short_warning': "Ваш пароль короче 8 символов.",
+        'create_account_button': "Создать аккаунт",
+        'username_occupied_error': "Имя пользователя занято.",
+        'account_created_success': "Аккаунт успешно создан!",
+        'provide_username_password_error': "Пожалуйста, предоставьте и имя пользователя, и пароль.",
+        'username': "Имя пользователя",
+        'password': "Пароль",
+        'login_button': "Войти",
+        'logged_in_success': "Успешный вход!",
+        'invalid_username_password_error': "Неверное имя пользователя или пароль.",
+        'my_projects': "Мои проекты",
+        'current_account': "Текущий аккаунт: {account}",
+        'add_files_manually': "Добавить файлы вручную",
+        'upload_file': "Загрузить файл",
+        'write_file_manually': "Написать файл вручную",
+        'upload_your_html_file': "Загрузите ваш html файл здесь.",
+        'uploaded_file_name': "Имя загруженного файла: {filename}",
+        'file_content': "Содержимое файла:",
+        'add_to_database': "Добавить в базу данных",
+        'enter_data_manually': "Введите данные вручную.",
+        'filename': "Имя файла",
+        'content': "Содержимое",
+        'existing_projects': "Существующие проекты",
+        'no_files_found': "Файлы для этого пользователя не найдены.",
+        'export': "Экспорт",
+        'download_started': "Загрузка началась !",
+        'edit': "Редактировать",
+        'open_in_code_editor': "Открыть этот файл в редакторе кода",
+        'opened_in_web_editor': "Открыто в веб-редакторе !"
+    },
+    'de': {
+        'authentication': "Authentifizierung",
+        'create_new_account': "Neues Konto erstellen",
+        'login_existing_account': "In bestehendes Konto einloggen",
+        'create_unique_username': "Erstellen Sie einen eindeutigen Benutzernamen",
+        'create_password': "Erstellen Sie ein Passwort",
+        'password_short_warning': "Ihr Passwort ist kürzer als 8 Zeichen.",
+        'create_account_button': "Konto erstellen",
+        'username_occupied_error': "Der Benutzername ist besetzt.",
+        'account_created_success': "Konto erfolgreich erstellt!",
+        'provide_username_password_error': "Bitte geben Sie sowohl einen Benutzernamen als auch ein Passwort an.",
+        'username': "Benutzername",
+        'password': "Passwort",
+        'login_button': "Einloggen",
+        'logged_in_success': "Erfolgreich eingeloggt!",
+        'invalid_username_password_error': "Ungültiger Benutzername oder Passwort.",
+        'my_projects': "Meine Projekte",
+        'current_account': "Aktuelles Konto: {account}",
+        'add_files_manually': "Dateien manuell hinzufügen",
+        'upload_file': "Datei hochladen",
+        'write_file_manually': "Datei manuell schreiben",
+        'upload_your_html_file': "Laden Sie Ihre HTML-Datei hier hoch.",
+        'uploaded_file_name': "Hochgeladener Dateiname: {filename}",
+        'file_content': "Dateiinhalt:",
+        'add_to_database': "Zur Datenbank hinzufügen",
+        'enter_data_manually': "Daten manuell eingeben.",
+        'filename': "Dateiname",
+        'content': "Inhalt",
+        'existing_projects': "Bestehende Projekte",
+        'no_files_found': "Keine Dateien für diesen Benutzer gefunden.",
+        'export': "Exportieren",
+        'download_started': "Der Download wurde gestartet !",
+        'edit': "Bearbeiten",
+        'open_in_code_editor': "Diese Datei im Code-Editor öffnen",
+        'opened_in_web_editor': "Im Web-Editor geöffnet !"
+    }
+}
+
 # Create a header for the app
-st.header("Authentication")
+st.header(translations[st.session_state.lang]['authentication'])
 
 # Create tabs for different login methods
-tab1, tab2 = st.tabs(["Create new account", "Login to existing account"])
+tab1, tab2 = st.tabs([translations[st.session_state.lang]['create_new_account'], translations[st.session_state.lang]['login_existing_account']])
 
 # Initialize session state
 if 'account' not in st.session_state:
@@ -116,48 +228,48 @@ initialize_database(db_path)
 
 # Create new account tab
 with tab1:
-    st.subheader("Create a new account")
-    create_username = st.text_input("Create a unique username", key="create_username")
-    create_password = st.text_input("Create a password", type="password", key="create_password")
+    st.subheader(translations[st.session_state.lang]['create_new_account'])
+    create_username = st.text_input(translations[st.session_state.lang]['create_unique_username'], key="create_username")
+    create_password = st.text_input(translations[st.session_state.lang]['create_password'], type="password", key="create_password")
     
     if len(create_password) < 8 and create_password != "":
-        st.warning("Your password is shorter than 8 symbols.")
+        st.warning(translations[st.session_state.lang]['password_short_warning'])
     
-    if st.button("Create account"):
+    if st.button(translations[st.session_state.lang]['create_account_button']):
         if create_username and create_password:
             with sqlite3.connect(db_path) as db:
                 cursor = db.cursor()
                 if username_exists(cursor, create_username):
-                    st.error("The username is occupied.")
+                    st.error(translations[st.session_state.lang]['username_occupied_error'])
                 else:
                     hashed_password = hash_it_quick(create_password)
                     cursor.execute("INSERT INTO users (username, password) VALUES (?, ?)", (create_username, hashed_password))
-                    st.success("Account created successfully!")
+                    st.success(translations[st.session_state.lang]['account_created_success'])
                     st.session_state.account = create_username
                     st.session_state.account_id = get_user_id_by_username(cursor, st.session_state.account)
                     debug_print(f"User: {create_username}, ID: {get_user_id_by_username(cursor, st.session_state.account)} added to the database.")
                     db.commit()
         else:
-            st.error("Please provide both a username and a password.")
+            st.error(translations[st.session_state.lang]['provide_username_password_error'])
 
 # Login to existing account tab
 with tab2:
-    st.subheader("Login to existing account")
-    login_username = st.text_input("Username", key="login_username")
-    login_password = st.text_input("Password", type="password", key="login_password")
+    st.subheader(translations[st.session_state.lang]['login_existing_account'])
+    login_username = st.text_input(translations[st.session_state.lang]['username'], key="login_username")
+    login_password = st.text_input(translations[st.session_state.lang]['password'], type="password", key="login_password")
     
-    if st.button("Login"):
+    if st.button(translations[st.session_state.lang]['login_button']):
         if login_username and login_password:
             with sqlite3.connect(db_path) as db:
                 cursor = db.cursor()
                 if verify_login(cursor, login_username, login_password):
-                    st.success("Logged in successfully!")
+                    st.success(translations[st.session_state.lang]['logged_in_success'])
                     st.session_state.account = login_username
                     st.session_state.account_id = get_user_id_by_username(cursor, st.session_state.account)
                 else:
-                    st.error("Invalid username or password.")
+                    st.error(translations[st.session_state.lang]['invalid_username_password_error'])
         else:
-            st.error("Please provide both username and password.")
+            st.error(translations[st.session_state.lang]['provide_username_password_error'])
 
 # Hide Streamlit's default footer and menu
 hide_streamlit_style = """
@@ -170,26 +282,25 @@ st.markdown(hide_streamlit_style, unsafe_allow_html=True)
 
 st.divider()
 
-
 if st.session_state.account:
-    st.header("My projects")
-    st.write(f"Current account: {st.session_state.account}")
+    st.header(translations[st.session_state.lang]['my_projects'])
+    st.write(translations[st.session_state.lang]['current_account'].format(account=st.session_state.account))
 
-    with st.expander("Add files manually"):
-        tab1, tab2 = st.tabs(["Upload file", "Write file manually"])
+    with st.expander(translations[st.session_state.lang]['add_files_manually']):
+        tab1, tab2 = st.tabs([translations[st.session_state.lang]['upload_file'], translations[st.session_state.lang]['write_file_manually']])
         
         # Tab 1: Upload a file
         with tab1:
-            uploaded_file = st.file_uploader(label="Upload your html file here.")
+            uploaded_file = st.file_uploader(label=translations[st.session_state.lang]['upload_your_html_file'])
             if uploaded_file is not None:
                 # Read file content
                 file_content = uploaded_file.getvalue()
                 # Get filename
                 filename = uploaded_file.name
-                st.write(f"Uploaded file name: {filename}")
-                st.write("File content:")
+                st.write(translations[st.session_state.lang]['uploaded_file_name'].format(filename=filename))
+                st.write(translations[st.session_state.lang]['file_content'])
                 st.write(file_content)
-                if st.button("Add to database", key="upload_button"):
+                if st.button(translations[st.session_state.lang]['add_to_database'], key="upload_button"):
                     with sqlite3.connect(db_path) as db:
                         cursor = db.cursor()
                         cursor.execute("INSERT INTO files (filename, source) VALUES (?, ?)", (filename, file_content))
@@ -200,11 +311,11 @@ if st.session_state.account:
         
         # Tab 2: Write file manually
         with tab2:
-            st.write("Enter data manually.")
-            filename = st.text_input("Filename", key="manual_filename")
-            filecont = st.text_area("Content", key="manual_content")
+            st.write(translations[st.session_state.lang]['enter_data_manually'])
+            filename = st.text_input(translations[st.session_state.lang]['filename'], key="manual_filename")
+            filecont = st.text_area(translations[st.session_state.lang]['content'], key="manual_content")
             
-            if st.button("Add to database", key="manual_button"):
+            if st.button(translations[st.session_state.lang]['add_to_database'], key="manual_button"):
                 if filename and filecont:
                      with sqlite3.connect(db_path) as db:
                         cursor = db.cursor()
@@ -214,8 +325,7 @@ if st.session_state.account:
                         db.commit()
                         st.success(f"File added to the database with file_id: {file_id}")
 
-
-    with st.expander("Existing projects"):
+    with st.expander(translations[st.session_state.lang]['existing_projects']):
         with sqlite3.connect(db_path) as db:
             cursor = db.cursor()
             user_id = get_user_id_by_username(cursor, st.session_state.account)
@@ -232,21 +342,21 @@ if st.session_state.account:
                         file_json = json.loads(file_json_str)  # Parse the JSON string into a dictionary
                         st.write(f"**File ID**: {file_id}")
                         st.write(f"**Filename**: {file_json['filename']}")
-                        st.write("**File contents:**")
+                        st.write(translations[st.session_state.lang]['file_content'])
                         st.code(file_json["content"], line_numbers=True)
                         btn1, btn2 = st.columns(2)
                         with btn1:
                             # Create a button for downloading the file
                             if st.download_button(
-                                    label="Export",
+                                    label=translations[st.session_state.lang]['export'],
                                     data=file_json["content"],
                                     file_name=file_json['filename'],
                                     key=f"Download from bd{file_id}"
                                 ):
-                                st.success("Download started !")
+                                st.success(translations[st.session_state.lang]['download_started'])
                         with btn2:
-                            if st.button(label="Edit", help="Open this file in code editor", key=f"{file_id}_export"):
+                            if st.button(label=translations[st.session_state.lang]['edit'], help=translations[st.session_state.lang]['open_in_code_editor'], key=f"{file_id}_export"):
                                 st.session_state.edited_content = file_json["content"]
-                                st.success("Opened in Web Editor !")
+                                st.success(translations[st.session_state.lang]['opened_in_web_editor'])
             else:
-                st.write("No files found for this user.")
+                st.write(translations[st.session_state.lang]['no_files_found'])

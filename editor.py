@@ -11,6 +11,121 @@ from login import get_file_data_as_json
 import difflib
 import re
 
+# Define translations
+translations = {
+    'en': {
+        'welcome_title': "Welcome to our WebIDE !",
+        'welcome_description': "A simple website editor",
+        'choose_html_file': "Choose your HTML file.",
+        'use_generator': "Use generator, constructor",
+        'create_new_file': "Create new file",
+        'login_to_load': "Login to load project from account",
+        'no_files_found': "No files found for this user.",
+        'settings': "Settings",
+        'height_format': "height format:",
+        'min_max_lines': "min-max lines:",
+        'lang': "lang:",
+        'theme': "theme:",
+        'shortcuts': "shortcuts:",
+        'focus': "focus",
+        'wrap': "wrap",
+        'save': "Save",
+        'download': "Download",
+        'ai_coder': "AI coder",
+        'code_result': "Code result",
+        'enter_filename': "Enter filename",
+        'export': "Export",
+        'download_started': "Download started!",
+        'submit': "Submit",
+        'login_to_save': "Login to save your files.",
+        'verstkedit_ai_test': "VerstkEdit Ai test.",
+        'ask_assistant': "Ask the assistant any coding-related questions. The assistant has your code as context for your request.",
+        'code_context': "Code context",
+        'code_context_help': "Tick the checkbox to let Ai use your code as additional data.",
+        'send': "Send",
+        'edit': "Edit",
+        'assistant_code_preview': "Assistant's code preview",
+        'user_code_preview': "User's code preview",
+        'code_changes': "Code changes",
+        'diff_result': "Diff Result",
+        'page_preview': "Page preview"
+    },
+    'ru': {
+        'welcome_title': "Добро пожаловать в наш WebIDE !",
+        'welcome_description': "Простой редактор веб-сайтов",
+        'choose_html_file': "Выберите ваш HTML файл.",
+        'use_generator': "Используйте генератор, конструктор",
+        'create_new_file': "Создать новый файл",
+        'login_to_load': "Войдите, чтобы загрузить проект из аккаунта",
+        'no_files_found': "Файлы для этого пользователя не найдены.",
+        'settings': "Настройки",
+        'height_format': "формат высоты:",
+        'min_max_lines': "минимум-максимум строк:",
+        'lang': "язык:",
+        'theme': "тема:",
+        'shortcuts': "сочетания клавиш:",
+        'focus': "фокус",
+        'wrap': "перенос",
+        'save': "Сохранить",
+        'download': "Скачать",
+        'ai_coder': "AI кодер",
+        'code_result': "Результат кода",
+        'enter_filename': "Введите имя файла",
+        'export': "Экспорт",
+        'download_started': "Загрузка началась!",
+        'submit': "Отправить",
+        'login_to_save': "Войдите, чтобы сохранить ваши файлы.",
+        'verstkedit_ai_test': "Тест VerstkEdit Ai.",
+        'ask_assistant': "Задайте помощнику любые вопросы, связанные с кодированием. Помощник использует ваш код в качестве контекста для вашего запроса.",
+        'code_context': "Контекст кода",
+        'code_context_help': "Установите флажок, чтобы позволить Ai использовать ваш код в качестве дополнительных данных.",
+        'send': "Отправить",
+        'edit': "Редактировать",
+        'assistant_code_preview': "Предпросмотр кода помощника",
+        'user_code_preview': "Предпросмотр кода пользователя",
+        'code_changes': "Изменения кода",
+        'diff_result': "Результат сравнения",
+        'page_preview': "Предпросмотр страницы"
+    },
+    'de': {
+        'welcome_title': "Willkommen in unserem WebIDE !",
+        'welcome_description': "Ein einfacher Website-Editor",
+        'choose_html_file': "Wählen Sie Ihre HTML-Datei.",
+        'use_generator': "Verwenden Sie den Generator, den Konstruktor",
+        'create_new_file': "Neue Datei erstellen",
+        'login_to_load': "Melden Sie sich an, um das Projekt aus dem Konto zu laden",
+        'no_files_found': "Keine Dateien für diesen Benutzer gefunden.",
+        'settings': "Einstellungen",
+        'height_format': "Höhenformat:",
+        'min_max_lines': "min-max Zeilen:",
+        'lang': "Sprache:",
+        'theme': "Thema:",
+        'shortcuts': "Tastenkombinationen:",
+        'focus': "Fokus",
+        'wrap': "Umbruch",
+        'save': "Speichern",
+        'download': "Herunterladen",
+        'ai_coder': "AI-Coder",
+        'code_result': "Code-Ergebnis",
+        'enter_filename': "Geben Sie den Dateinamen ein",
+        'export': "Exportieren",
+        'download_started': "Der Download wurde gestartet!",
+        'submit': "Senden",
+        'login_to_save': "Melden Sie sich an, um Ihre Dateien zu speichern.",
+        'verstkedit_ai_test': "VerstkEdit Ai-Test.",
+        'ask_assistant': "Stellen Sie dem Assistenten alle kodierungsbezogenen Fragen. Der Assistent verwendet Ihren Code als Kontext für Ihre Anfrage.",
+        'code_context': "Code-Kontext",
+        'code_context_help': "Aktivieren Sie das Kontrollkästchen, um dem Ai die Verwendung Ihres Codes als zusätzliche Daten zu ermöglichen.",
+        'send': "Senden",
+        'edit': "Bearbeiten",
+        'assistant_code_preview': "Vorschau des Assistenten-Codes",
+        'user_code_preview': "Vorschau des Benutzer-Codes",
+        'code_changes': "Codeänderungen",
+        'diff_result': "Diff-Ergebnis",
+        'page_preview': "Seitenvorschau"
+    }
+}
+
 # Initialize session state variables
 if 'uploaded_file_content' not in st.session_state:
     st.session_state.uploaded_file_content = None
@@ -56,18 +171,17 @@ mode_list = ["abap", "abc", "actionscript", "ada", "alda", "apache_conf", "apex"
 
 btns = custom_buttons_alt
 
-st.title("Welcome to our WebIDE !")
-st.markdown("A simple website editor")
+st.title(translations[st.session_state.lang]['welcome_title'])
+st.markdown(translations[st.session_state.lang]['welcome_description'])
 
 upload, load = st.columns([3, 3])
 
 with upload:
     with st.container(border=True, height=350):
-        uploaded_file = st.file_uploader(label="Choose your HTML file.", label_visibility="collapsed")
-        st.subheader("Or")
-        st.write("Use generator, constructor")
-        st.subheader("Or")
-        if st.button("Create new file"):
+        uploaded_file = st.file_uploader(label=translations[st.session_state.lang]['choose_html_file'], label_visibility="collapsed")
+        st.subheader(translations[st.session_state.lang]['use_generator'])
+        st.subheader(translations[st.session_state.lang]['create_new_file'])
+        if st.button(translations[st.session_state.lang]['create_new_file']):
             st.session_state.edited_content = ""
         
 
@@ -89,16 +203,16 @@ with load:
                                 file_json_str = get_file_data_as_json(cursor, file_id)
                                 file_json = json.loads(file_json_str)  # Parse the JSON string into a dictionary
                                 st.write(f"**Filename**: {file_json['filename']}")
-                                st.write("**File contents:**")
+                                st.write(translations[st.session_state.lang]['file_content'])
                                 with st.expander("View source code"):
                                     st.code(file_json["content"], line_numbers=True)
-                                if st.button(label="Edit", help="Open this file in code editor", key=f"{file_id}_export"):
+                                if st.button(label=translations[st.session_state.lang]['edit'], help=translations[st.session_state.lang]['open_in_code_editor'], key=f"{file_id}_export"):
                                     st.session_state.edited_content = file_json["content"]
-                                    st.success("Opened in Web Editor !")
+                                    st.success(translations[st.session_state.lang]['opened_in_web_editor'])
                     else:
-                        st.write("No files found for this user.")
+                        st.write(translations[st.session_state.lang]['no_files_found'])
         else:
-            st.warning("Login to load project from account")
+            st.warning(translations[st.session_state.lang]['login_to_load'])
 
 if uploaded_file is not None:
     st.session_state.uploaded_file_content = uploaded_file.read().decode('utf-8')
@@ -109,54 +223,54 @@ if st.session_state.edited_content is not None:
     st.write("filename:", uploaded_file.name if uploaded_file else "Not defined")
 
     st.write("")
-    with st.expander("Settings", expanded=True):
+    with st.expander(translations[st.session_state.lang]['settings'], expanded=True):
         col_a, col_b, col_c, col_cb = st.columns([6,11,3,3])
         col_c.markdown('<div style="height: 2.5rem;"><br/></div>', unsafe_allow_html=True)
         col_cb.markdown('<div style="height: 2.5rem;"><br/></div>', unsafe_allow_html=True)
 
-        height_type = col_a.selectbox("height format:", ["min-max lines"])
+        height_type = col_a.selectbox(translations[st.session_state.lang]['height_format'], ["min-max lines"])
         if height_type == "min-max lines":
-            st.session_state.height = col_b.slider("min-max lines:", 1, 40, st.session_state.height)
+            st.session_state.height = col_b.slider(translations[st.session_state.lang]['min_max_lines'], 1, 40, st.session_state.height)
 
         col_d, col_e, col_f = st.columns([1,1,1])
-        st.session_state.language = col_d.selectbox("lang:", mode_list, index=mode_list.index(st.session_state.language))
-        st.session_state.theme = col_e.selectbox("theme:", ["default", "light", "dark", "contrast"], index=["default", "light", "dark", "contrast"].index(st.session_state.theme))
-        st.session_state.shortcuts = col_f.selectbox("shortcuts:", ["emacs", "vim", "vscode", "sublime"], index=["emacs", "vim", "vscode", "sublime"].index(st.session_state.shortcuts))
-        st.session_state.focus = col_c.checkbox("focus", st.session_state.focus)
-        st.session_state.wrap = col_cb.checkbox("wrap", st.session_state.wrap)
+        st.session_state.language = col_d.selectbox(translations[st.session_state.lang]['lang'], mode_list, index=mode_list.index(st.session_state.language))
+        st.session_state.theme = col_e.selectbox(translations[st.session_state.lang]['theme'], ["default", "light", "dark", "contrast"], index=["default", "light", "dark", "contrast"].index(st.session_state.theme))
+        st.session_state.shortcuts = col_f.selectbox(translations[st.session_state.lang]['shortcuts'], ["emacs", "vim", "vscode", "sublime"], index=["emacs", "vim", "vscode", "sublime"].index(st.session_state.shortcuts))
+        st.session_state.focus = col_c.checkbox(translations[st.session_state.lang]['focus'], st.session_state.focus)
+        st.session_state.wrap = col_cb.checkbox(translations[st.session_state.lang]['wrap'], st.session_state.wrap)
         
         # Render code editor
         ace_props = {"style": {"borderRadius": "0px 0px 8px 8px"}}
         response_dict = code_editor(bytes_data, height=st.session_state.height, lang=st.session_state.language, theme=st.session_state.theme, shortcuts=st.session_state.shortcuts, focus=st.session_state.focus, buttons=btns, info=info_bar, props=ace_props, options={"wrap": st.session_state.wrap}, allow_reset=True, key="code_editor_demo")    
 
         # Initial tabs
-        tabs = ["Save", "Download", "AI coder", "Code result"]
+        tabs = [translations[st.session_state.lang]['save'], translations[st.session_state.lang]['download'], translations[st.session_state.lang]['ai_coder'], translations[st.session_state.lang]['code_result']]
 
         # Create tabs
         tab_objects = st.tabs(tabs)
 
         # Assign tabs to variables
-        tab_save = tab_objects[tabs.index("Save")]
-        tab_download = tab_objects[tabs.index("Download")]
-        tab_ai_coder = tab_objects[tabs.index("AI coder")]
-        tab_code_result = tab_objects[tabs.index("Code result")]
+        tab_save = tab_objects[tabs.index(translations[st.session_state.lang]['save'])]
+        tab_download = tab_objects[tabs.index(translations[st.session_state.lang]['download'])]
+        tab_ai_coder = tab_objects[tabs.index(translations[st.session_state.lang]['ai_coder'])]
+        tab_code_result = tab_objects[tabs.index(translations[st.session_state.lang]['code_result'])]
             
         # Save Tab
         with tab_download:
-            filename = st.text_input(label="Enter filename", key='filename2')
+            filename = st.text_input(label=translations[st.session_state.lang]['enter_filename'], key='filename2')
             if st.download_button(
-                label="Export",
+                label=translations[st.session_state.lang]['export'],
                 data=st.session_state.get('edited_content', ''),
                 file_name=filename,
                 key="Download"
             ):
-                st.success("Download started!")
+                st.success(translations[st.session_state.lang]['download_started'])
             
             # Download Tab
             with tab_save:
                 if st.session_state.get('account', ''):
-                    filename = st.text_input(label="Enter filename", key='filename1')
-                    if st.button(label="Submit"):
+                    filename = st.text_input(label=translations[st.session_state.lang]['enter_filename'], key='filename1')
+                    if st.button(label=translations[st.session_state.lang]['submit']):
                         with sqlite3.connect(st.session_state.db_path) as db:
                             cursor = db.cursor()
                             cursor.execute("INSERT INTO files (filename, source) VALUES (?, ?)", (filename, st.session_state.get('edited_content', '')))
@@ -166,7 +280,7 @@ if st.session_state.edited_content is not None:
                             st.success(f"File added to the database with file_id: {file_id}")
                             st.success("Saved to your account. Visit the login page to see.")
                 else:
-                    st.error("Login to save your files.")
+                    st.error(translations[st.session_state.lang]['login_to_save'])
                     
         with tab_ai_coder:
             # This code is a merge of assistant.py and compare.py, using both 
@@ -174,7 +288,7 @@ if st.session_state.edited_content is not None:
             context = False
 
             diff_result = ""
-            st.header("VerstkEdit Ai test.")
+            st.header(translations[st.session_state.lang]['verstkedit_ai_test'])
             UserCode = st.session_state.edited_content
 
             css = st.markdown("""
@@ -245,8 +359,8 @@ if st.session_state.edited_content is not None:
             if 'hf_token' not in st.session_state:
                 st.session_state.hf_token = ""
 
-            st.markdown("Ask the assistant any coding-related questions. The assistant has your code as context for your request.")
-            context = st.checkbox("Code context", help="Tick the checkbox to let Ai use your code as additional data. ")    
+            st.markdown(translations[st.session_state.lang]['ask_assistant'])
+            context = st.checkbox(translations[st.session_state.lang]['code_context'], help=translations[st.session_state.lang]['code_context_help'])    
             request = st.text_area(label="", label_visibility="collapsed")
             if context:
                 request = f"""
@@ -262,15 +376,15 @@ if st.session_state.edited_content is not None:
             pt1, pt2 = st.columns(2)
             
             with pt1:
-                if st.button("Send"):
+                if st.button(translations[st.session_state.lang]['send']):
                     response = send(request)
                     if response != "Error":
                         print("Text writing successfully!", response)
-                        t1 ,t2, t3 = st.tabs(["Assistant's code preview", "User's code preview", "Code changes"])
+                        t1 ,t2, t3 = st.tabs([translations[st.session_state.lang]['assistant_code_preview'], translations[st.session_state.lang]['user_code_preview'], translations[st.session_state.lang]['code_changes']])
                         response = find_between(response, "```", "```")
                         with pt2:
                             if response != "":
-                                if st.button("Edit", help="Rewrites your current file with ai generated content"):
+                                if st.button(translations[st.session_state.lang]['edit'], help=translations[st.session_state.lang]['open_in_code_editor']):
                                     st.session_state.edited_content = response
                         
                         with t1:
@@ -288,14 +402,14 @@ if st.session_state.edited_content is not None:
                 
 
         if diff_result is not None and diff_result is not "":
-            st.subheader("Diff Result")
+            st.subheader(translations[st.session_state.lang]['diff_result'])
             st.code(diff_result, language='diff')
-            st.header("Page preview")
+            st.header(translations[st.session_state.lang]['page_preview'])
             st.components.v1.html(response)
         
         # Code Result Tab (conditionally rendered)
         if 'response_dict' in locals() and response_dict.get('type') == "submit":
             with tab_code_result:
-                st.header("Page preview")
+                st.header(translations[st.session_state.lang]['page_preview'])
                 st.components.v1.html(response_dict['text'], height=750)
                 st.session_state.edited_content = response_dict['text']
