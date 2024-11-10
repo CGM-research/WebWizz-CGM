@@ -2,6 +2,24 @@ import streamlit as st
 
 st.set_page_config(layout="wide")
 
+# Initialize session state with default values if they don't exist
+if 'hf_token' not in st.session_state:
+    st.session_state.hf_token = ""
+if 'px_token' not in st.session_state:
+    st.session_state.px_token = ""
+if 'context' not in st.session_state:
+    st.session_state.context = False
+if 'db_path' not in st.session_state:
+    st.session_state.db_path = './Data/DB/app.db'
+if 'account' not in st.session_state:
+    st.session_state.account = ""
+if 'account_id' not in st.session_state:
+    st.session_state.account_id = ""
+if 'change' not in st.session_state:
+    st.session_state.change = True
+if 'edited_content' not in st.session_state:
+    st.session_state.edited_content = ""
+
 # Define translations
 translations = {
     'en': {
@@ -9,27 +27,24 @@ translations = {
         'to_be_implemented': "To be implemented ...",
         'navigation': "Navigation",
         'pages': "Pages: ",
-        'guides': "Guides",
-        'user_manual_us': "User manual (UK/US)",
-        'user_manual_ru': "Руководство (RU)"
+        'guides': "Learn more",
+        'user_manual_us': "User handbook",
     },
     'ru': {
         'language_selection': "Выбор языка",
         'to_be_implemented': "Будет реализовано ...",
         'navigation': "Навигация",
         'pages': "Страницы: ",
-        'guides': "Руководства",
-        'user_manual_us': "Руководство пользователя (UK/US)",
-        'user_manual_ru': "Руководство (RU)"
+        'guides': "Информация",
+        'user_manual_ru': "Руководство"
     },
     'de': {
         'language_selection': "Sprachauswahl",
         'to_be_implemented': "Wird implementiert ...",
         'navigation': "Navigation",
         'pages': "Seiten: ",
-        'guides': "Anleitungen",
-        'user_manual_us': "Benutzerhandbuch (UK/US)",
-        'user_manual_ru': "Ratgeber (RU)"
+        'guides': "Zusätzliche Informationen",
+        'user_manual_de': "Benutzerhandbuch",
     }
 }
 
@@ -110,8 +125,12 @@ def main():
     st.sidebar.divider()
     
     st.sidebar.title(translations[st.session_state.lang]['guides'])
-    st.sidebar.link_button(label=translations[st.session_state.lang]['user_manual_us'], url="https://github.com/Wafflelover404/WebWizz/blob/main/ExtraFiles/guides/en.md")
-    st.sidebar.link_button(label=translations[st.session_state.lang]['user_manual_ru'], url="https://github.com/Wafflelover404/WebWizz/blob/main/ExtraFiles/guides/ru.md")
+    if  st.session_state.lang == 'en':
+        st.sidebar.link_button(label=translations[st.session_state.lang]['user_manual_us'], url="https://github.com/Wafflelover404/WebWizz/blob/main/ExtraFiles/guides/en.md")
+    if  st.session_state.lang == 'ru':
+        st.sidebar.link_button(label=translations[st.session_state.lang]['user_manual_ru'], url="https://github.com/Wafflelover404/WebWizz/blob/main/ExtraFiles/guides/ru.md")
+    if  st.session_state.lang == 'de':
+        st.sidebar.link_button(label=translations[st.session_state.lang]['user_manual_de'], url="https://github.com/Wafflelover404/WebWizz/blob/main/ExtraFiles/guides/de.md")
 
     # Load and display the selected page
     page_path = PAGE_PATHS[selection]

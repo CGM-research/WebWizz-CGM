@@ -38,17 +38,19 @@ translations = {
         'download_started': "Download started!",
         'submit': "Submit",
         'login_to_save': "Login to save your files.",
-        'verstkedit_ai_test': "VerstkEdit Ai test.",
+        'verstkedit_ai_test': "WebWizz Ai test.",
         'ask_assistant': "Ask the assistant any coding-related questions. The assistant has your code as context for your request.",
         'code_context': "Code context",
         'code_context_help': "Tick the checkbox to let Ai use your code as additional data.",
         'send': "Send",
         'edit': "Edit",
         'assistant_code_preview': "Assistant's code preview",
-        'user_code_preview': "User's code preview",
+        'user_code_preview': "Source code",
         'code_changes': "Code changes",
         'diff_result': "Diff Result",
-        'page_preview': "Page preview"
+        'page_preview': "Page preview",
+        'file_content': "File content:",
+        'opened_in_web_editor': "Opened in Web Editor !"
     },
     'ru': {
         'welcome_title': "Добро пожаловать в наш WebIDE !",
@@ -75,17 +77,19 @@ translations = {
         'download_started': "Загрузка началась!",
         'submit': "Отправить",
         'login_to_save': "Войдите, чтобы сохранить ваши файлы.",
-        'verstkedit_ai_test': "Тест VerstkEdit Ai.",
+        'verstkedit_ai_test': "Тест WebWizz Ai.",
         'ask_assistant': "Задайте помощнику любые вопросы, связанные с кодированием. Помощник использует ваш код в качестве контекста для вашего запроса.",
         'code_context': "Контекст кода",
         'code_context_help': "Установите флажок, чтобы позволить Ai использовать ваш код в качестве дополнительных данных.",
         'send': "Отправить",
         'edit': "Редактировать",
         'assistant_code_preview': "Предпросмотр кода помощника",
-        'user_code_preview': "Предпросмотр кода пользователя",
+        'user_code_preview': "Исходный код",
         'code_changes': "Изменения кода",
         'diff_result': "Результат сравнения",
-        'page_preview': "Предпросмотр страницы"
+        'page_preview': "Предпросмотр страницы",
+        'file_content': "Содержимое файла:",
+        'opened_in_web_editor': "Открыто в веб-редакторе !"
     },
     'de': {
         'welcome_title': "Willkommen in unserem WebIDE !",
@@ -112,23 +116,25 @@ translations = {
         'download_started': "Der Download wurde gestartet!",
         'submit': "Senden",
         'login_to_save': "Melden Sie sich an, um Ihre Dateien zu speichern.",
-        'verstkedit_ai_test': "VerstkEdit Ai-Test.",
+        'verstkedit_ai_test': "WebWizz Ai-Test.",
         'ask_assistant': "Stellen Sie dem Assistenten alle kodierungsbezogenen Fragen. Der Assistent verwendet Ihren Code als Kontext für Ihre Anfrage.",
         'code_context': "Code-Kontext",
         'code_context_help': "Aktivieren Sie das Kontrollkästchen, um dem Ai die Verwendung Ihres Codes als zusätzliche Daten zu ermöglichen.",
         'send': "Senden",
         'edit': "Bearbeiten",
         'assistant_code_preview': "Vorschau des Assistenten-Codes",
-        'user_code_preview': "Vorschau des Benutzer-Codes",
+        'user_code_preview': "Quellcode",
         'code_changes': "Codeänderungen",
         'diff_result': "Diff-Ergebnis",
-        'page_preview': "Seitenvorschau"
+        'page_preview': "Seitenvorschau",
+        'file_content': "Dateiinhalt:",
+        'opened_in_web_editor': "Im Web-Editor geöffnet !"
     }
 }
 
 # Initialize session state variables
 if 'uploaded_file_content' not in st.session_state:
-    st.session_state.uploaded_file_content = None
+    st.session_state.uploaded_file_content = ""
 if 'height' not in st.session_state:
     st.session_state.height = [19, 22]
 if 'language' not in st.session_state:
@@ -142,12 +148,12 @@ if 'focus' not in st.session_state:
 if 'wrap' not in st.session_state:
     st.session_state.wrap = True
 if 'edited_content' not in st.session_state:
-    st.session_state.edited_content = None
+    st.session_state.edited_content = ""
 if 'account' not in st.session_state:
     st.session_state.account = ""
 if 'show_ai_coder' not in st.session_state:
     st.session_state.show_ai_coder = False
-    
+
 def find_between(s, first, last):
     try:
         start = s.find(first) + len(first)
@@ -206,7 +212,7 @@ with load:
                                 st.write(translations[st.session_state.lang]['file_content'])
                                 with st.expander("View source code"):
                                     st.code(file_json["content"], line_numbers=True)
-                                if st.button(label=translations[st.session_state.lang]['edit'], help=translations[st.session_state.lang]['open_in_code_editor'], key=f"{file_id}_export"):
+                                if st.button(label=translations[st.session_state.lang]['edit'], key=f"{file_id}_export"):
                                     st.session_state.edited_content = file_json["content"]
                                     st.success(translations[st.session_state.lang]['opened_in_web_editor'])
                     else:
@@ -214,11 +220,11 @@ with load:
         else:
             st.warning(translations[st.session_state.lang]['login_to_load'])
 
-if uploaded_file is not None:
+if uploaded_file != None:
     st.session_state.uploaded_file_content = uploaded_file.read().decode('utf-8')
     st.session_state.edited_content = st.session_state.uploaded_file_content
 
-if st.session_state.edited_content is not None:
+if st.session_state.edited_content != None:
     bytes_data = st.session_state.edited_content
     st.write("filename:", uploaded_file.name if uploaded_file else "Not defined")
 
@@ -382,16 +388,12 @@ if st.session_state.edited_content is not None:
                         print("Text writing successfully!", response)
                         t1 ,t2, t3 = st.tabs([translations[st.session_state.lang]['assistant_code_preview'], translations[st.session_state.lang]['user_code_preview'], translations[st.session_state.lang]['code_changes']])
                         response = find_between(response, "```", "```")
-                        with pt2:
-                            if response != "":
-                                if st.button(translations[st.session_state.lang]['edit'], help=translations[st.session_state.lang]['open_in_code_editor']):
-                                    st.session_state.edited_content = response
                         
                         with t1:
                             st.components.v1.html(response, height=750)
                             
                         with t2:
-                            st.components.v1.html(st.session_state.edited_content, height=750)
+                            st.code(response)
                             
                         with t3:
                             # Display the difference result between user's code and ai's
@@ -400,8 +402,12 @@ if st.session_state.edited_content is not None:
                     else:
                         print("An error occurred while communicating with TextAi.")
                 
-
-        if diff_result is not None and diff_result is not "":
+            #with pt2:
+            #    if response != "":
+            #        if st.button(translations[st.session_state.lang]['edit']):
+            #            st.session_state.edited_content = response
+            #            
+        if diff_result != None and diff_result != "":
             st.subheader(translations[st.session_state.lang]['diff_result'])
             st.code(diff_result, language='diff')
             st.header(translations[st.session_state.lang]['page_preview'])
