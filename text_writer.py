@@ -21,7 +21,7 @@ def send(prompt):
     print(prompt)
     for i in range(0, 10):
         try:
-            promptd = [{'role': 'system', 'content':""" Write website article text based on provided data. Make it very brief. 2-3 sentences.
+            promptd = [{'role': 'system', 'content':f""" Write website article text based on provided data. Make it very brief. 2-3 sentences. Response with {st.session_state.lang} language only
                 """}, {'role': 'user', 'content': f'{prompt}'}]
             response = query({
                "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
