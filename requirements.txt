@@ -4,3 +4,4 @@ bcrypt
 Pillow
 requests
 beautifulsoup4==4.12.3
+g4f
