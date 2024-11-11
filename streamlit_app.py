@@ -117,7 +117,27 @@ def load_page(path):
 
 def main():
     st.sidebar.title(translations[st.session_state.lang]['language_selection'])
-    st.session_state.lang = st.sidebar.selectbox('Select Language', ['en', 'ru', 'de'], index=['en', 'ru', 'de'].index(st.session_state.lang), key="randomkey")
+    
+    # Define flags for each language
+    flags = {
+        'en': '🇬🇧',
+        'ru': '🇷🇺',
+        'de': '🇩🇪'
+    }
+    
+    # Create a list of language options with flags
+    language_options = [f"{flags[lang]} {lang.upper()}" for lang in ['en', 'ru', 'de']]
+    
+    # Get the current selected language with flag
+    current_lang_with_flag = f"{flags[st.session_state.lang]} {st.session_state.lang.upper()}"
+    
+    # Create the selectbox with flags
+    selected_lang_with_flag = st.sidebar.selectbox('Select Language', language_options, index=language_options.index(current_lang_with_flag), key="randomkey")
+    
+    # Extract the language code from the selected option
+    selected_lang = selected_lang_with_flag.split()[-1].lower()
+    st.session_state.lang = selected_lang
+    
     st.sidebar.divider()
     st.sidebar.title(translations[st.session_state.lang]['navigation'])
     selection = st.sidebar.radio(translations[st.session_state.lang]['pages'], list(PAGE_PATHS.keys()))
