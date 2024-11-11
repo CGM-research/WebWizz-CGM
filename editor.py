@@ -10,6 +10,8 @@ from login import get_file_ids_by_user_id
 from login import get_file_data_as_json
 import difflib
 import re
+from g4f.client import Client
+from g4f.Provider import DarkAI
 
 # Define translations
 translations = {
@@ -38,7 +40,7 @@ translations = {
         'download_started': "Download started!",
         'submit': "Submit",
         'login_to_save': "Login to save your files.",
-        'verstkedit_ai_test': "WebWizz Ai test.",
+        'verstkedit_ai_test': "WebWizz Ai test. (β)",
         'ask_assistant': "Ask the assistant any coding-related questions. The assistant has your code as context for your request.",
         'code_context': "Code context",
         'code_context_help': "Tick the checkbox to let Ai use your code as additional data.",
@@ -77,7 +79,7 @@ translations = {
         'download_started': "Загрузка началась!",
         'submit': "Отправить",
         'login_to_save': "Войдите, чтобы сохранить ваши файлы.",
-        'verstkedit_ai_test': "Тест WebWizz Ai.",
+        'verstkedit_ai_test': "Тест WebWizz Ai. (β)",
         'ask_assistant': "Задайте помощнику любые вопросы, связанные с кодированием. Помощник использует ваш код в качестве контекста для вашего запроса.",
         'code_context': "Контекст кода",
         'code_context_help': "Установите флажок, чтобы позволить Ai использовать ваш код в качестве дополнительных данных.",
@@ -116,7 +118,7 @@ translations = {
         'download_started': "Der Download wurde gestartet!",
         'submit': "Senden",
         'login_to_save': "Melden Sie sich an, um Ihre Dateien zu speichern.",
-        'verstkedit_ai_test': "WebWizz Ai-Test.",
+        'verstkedit_ai_test': "WebWizz Ai-Test. (β)",
         'ask_assistant': "Stellen Sie dem Assistenten alle kodierungsbezogenen Fragen. Der Assistent verwendet Ihren Code als Kontext für Ihre Anfrage.",
         'code_context': "Code-Kontext",
         'code_context_help': "Aktivieren Sie das Kontrollkästchen, um dem Ai die Verwendung Ihres Codes als zusätzliche Daten zu ermöglichen.",
@@ -330,32 +332,27 @@ if st.session_state.edited_content != None:
             API_URL = "https://api-inference.huggingface.co/models/mistralai/Mixtral-8x7B-Instruct-v0.1/v1/chat/completions"
             headers = {"Authorization": f"Bearer {hf_token}"}
 
-            def query(payload):
-                response = requests.post(API_URL, headers=headers, json=payload)
-                return response.json()
+            # Function to generate text using the g4f client
+            def generate_text(prompt):
+                client = Client()
+                response = client.chat.completions.create(
+                    model="gpt-4o",
+                    messages=[{"role": "user", "content": prompt}],
+                    provider=DarkAI
+                )
+                return response.choices[0].message.content
 
-            def replace_assistant(strin):
-                e = re.sub(r'<\|system\|>.*<\|assistant\|>', '', strin, flags=re.DOTALL)
-                e = re.sub(r'(?<=\?waffle\?)\S+', '', e)
-                return e.strip()
-
+            # Function to send prompt and get response
             def send(prompt):
                 print('generating')
                 print(prompt)
                 for i in range(0, 10):
                     try:
-                        promptd = [{'role': 'system', 'content':""" Assistants helps user with his coding tasks. Assistant can only respond with code.
-                            """}, {'role': 'user', 'content': f'{prompt}'}]
-                        response = query({
-                        "model": "mistralai/Mixtral-8x7B-Instruct-v0.1",
-                            "messages": promptd,
-                            "max_tokens": 8000,
-                            'stream': False
-                        })
-                        print(response['choices'][0]['message']['content'])
-                        full_response = response['choices'][0]['message']['content']
+                        system_prompt = f"""You are an HTML coding expert. Response with HTML code only, using user's code if provided. Always response with full code (User code and yours combined)."""
+                        full_prompt = f"{system_prompt}\n{prompt}"
+                        full_response = generate_text(full_prompt)
+                        print(full_response)
                         return full_response
-                        break
                     except Exception as e:
                         print(e)
                         pass

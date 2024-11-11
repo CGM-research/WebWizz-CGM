@@ -29,7 +29,9 @@ translations = {
         'login_error': "Login to save to account",
         'edit_button': "Edit",
         'edit_help': "Open this file in code editor",
-        'edit_success': "Opened in Web Editor!"
+        'edit_success': "Opened in Web Editor!",
+        'Select Language': 'Select Language',
+        'gen_lang': "Generation language select",
     },
     'ru': {
         'title': "Генерируйте веб-сайты легко !",
@@ -51,7 +53,8 @@ translations = {
         'login_error': "Войдите, чтобы сохранить в аккаунт",
         'edit_button': "Редактировать",
         'edit_help': "Открыть этот файл в редакторе кода",
-        'edit_success': "Открыто в веб-редакторе!"
+        'edit_success': "Открыто в веб-редакторе!",
+        'gen_lang': "Выбор языка генерации",
     },
     'de': {
         'title': "Webseiten einfach generieren !",
@@ -73,7 +76,8 @@ translations = {
         'login_error': "Melden Sie sich an, um im Konto zu speichern",
         'edit_button': "Bearbeiten",
         'edit_help': "Öffnen Sie diese Datei im Code-Editor",
-        'edit_success': "Im Web-Editor geöffnet!"
+        'edit_success': "Im Web-Editor geöffnet!",
+        'gen_lang': "Generation Sprachauswahl",
     }
 }
 
@@ -98,9 +102,12 @@ def replace_text(old_text, new_text):
             print(f"Replaced placeholders in '{path}'")
         else:
             print(f"The text '{old_text}' was not found in the file '{path}' - FATAL ERROR")
-
+            
 st.title(translations[st.session_state.lang]['title'])
 st.write(translations[st.session_state.lang]['description'])
+st.write(translations[st.session_state.lang]['gen_lang'])
+st.session_state.gen_lang = st.selectbox(label='',label_visibility='collapsed', options=['en', 'ru', 'de'], index=['en', 'ru', 'de'].index(st.session_state.lang), key="randomkey1")
+st.session_state.gen_lang = st.session_state.lang
 if st.session_state["hf_token"] == "" or st.session_state["px_token"] == "":
     st.warning(translations[st.session_state.lang]['warning'])
 
@@ -179,7 +186,7 @@ if st.session_state.generated_html:
         filename = st.text_input(label=translations[st.session_state.lang]['enter_filename'], key='filename2')
         if st.download_button(
             label=translations[st.session_state.lang]['export_button'],
-            data=st.session_state.get('edited_content', ''),
+            data=st.session_state.generated_html,
             file_name=filename,
             key="Download"
         ):
