@@ -107,7 +107,8 @@ PAGE_PATHS = {
     "Settings ⚙️": "config.py",
     "Generate ✨": "interface.py",
     "Build 🛠️": "construct.py",
-    "Edit 👨‍💻": "editor.py"
+    "Edit 👨‍💻": "editor.py",
+    "Gen-1 (β)": "./Generation/ui.py"
 }
 
 def load_page(path):

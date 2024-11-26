@@ -177,7 +177,7 @@ if st.button(translations[st.session_state.lang]['generate_button']):
                 st.session_state.generated_html = html_string
 
 if st.session_state.generated_html:
-    components.html(st.session_state.generated_html, height=900)
+    components.html(st.session_state.generated_html, height=750)
 
     tab_download, tab_save, tab_edit = st.tabs([translations[st.session_state.lang]['download_tab'], translations[st.session_state.lang]['save_tab'], translations[st.session_state.lang]['edit_tab']])
 
