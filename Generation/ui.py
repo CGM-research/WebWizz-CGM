@@ -22,7 +22,7 @@ st.set_page_config(
 
 def load_main():
     page_shop, edit, preview = st.tabs(["Page shop", "Edit code", "Preview"])
-    with page_shop:
+    with edit:
         # Define translations
         translations = {
             'en': {
@@ -191,8 +191,8 @@ def load_main():
 
         btns = custom_buttons_alt
 
-        st.title(translations[st.session_state.lang]['welcome_title'])
-        st.markdown(translations[st.session_state.lang]['welcome_description'])
+        #st.title(translations[st.session_state.lang]['welcome_title'])
+        #st.markdown(translations[st.session_state.lang]['welcome_description'])
 
         upload, load = st.columns([3, 3])
         with st.expander(translations[st.session_state.lang]['settings'], expanded=True):
@@ -202,7 +202,7 @@ def load_main():
 
             height_type = col_a.selectbox(translations[st.session_state.lang]['height_format'], ["min-max lines"])
             if height_type == "min-max lines":
-                st.session_state.height = col_b.slider(translations[st.session_state.lang]['min_max_lines'], 1, 40, st.session_state.height)
+                st.session_state.height = col_b.slider(translations[st.session_state.lang]['min_max_lines'], 1, 50, st.session_state.height)
 
             col_d, col_e, col_f = st.columns([1,1,1])
             st.session_state.language = col_d.selectbox(translations[st.session_state.lang]['lang'], mode_list, index=mode_list.index(st.session_state.language))
@@ -211,59 +211,100 @@ def load_main():
             st.session_state.focus = col_c.checkbox(translations[st.session_state.lang]['focus'], st.session_state.focus)
             st.session_state.wrap = col_cb.checkbox(translations[st.session_state.lang]['wrap'], st.session_state.wrap)
             
-            # Render code editor
-            ace_props = {"style": {"borderRadius": "0px 0px 8px 8px"}}
-            response_dict = code_editor(code="", height=st.session_state.height, lang=st.session_state.language, theme=st.session_state.theme, shortcuts=st.session_state.shortcuts, focus=st.session_state.focus, buttons=btns, info=info_bar, props=ace_props, options={"wrap": st.session_state.wrap}, allow_reset=True, key="code_editor_demo")    
+        # Render code editor
+        ace_props = {"style": {"borderRadius": "0px 0px 8px 8px"}}
+        response_dict = code_editor(code=st.session_state.edited_content, height=st.session_state.height, lang=st.session_state.language, theme=st.session_state.theme, shortcuts=st.session_state.shortcuts, focus=st.session_state.focus, buttons=btns, info=info_bar, props=ace_props, options={"wrap": st.session_state.wrap}, allow_reset=True, key="code_editor_demo")    
 
-            filename = st.text_input(label=translations[st.session_state.lang]['enter_filename'], key='filename2')
-            if st.download_button(
-                label=translations[st.session_state.lang]['export'],
-                data=st.session_state.get('edited_content', ''),
-                file_name=filename,
-                key="Download"
-            ):
-                st.success(translations[st.session_state.lang]['download_started'])
-            
-            # Code Result Tab (conditionally rendered)
-            if 'response_dict' in locals() and response_dict.get('type') == "submit":
-                with tab_code_result:
-                    st.header(translations[st.session_state.lang]['page_preview'])
-                    st.components.v1.html(response_dict['text'], height=750)
-                    st.session_state.edited_content = response_dict['text']
+        filename = st.text_input(label=translations[st.session_state.lang]['enter_filename'], key='filename2')
+        if st.download_button(
+            label=translations[st.session_state.lang]['export'],
+            data=st.session_state.get('edited_content', ''),
+            file_name=filename,
+            key="Download"
+        ):
+            st.success(translations[st.session_state.lang]['download_started'])
+        
+        # Code Result Tab (conditionally rendered)
+        if 'response_dict' in locals() and response_dict.get('type') == "submit":
+            st.header(translations[st.session_state.lang]['page_preview'])
+            st.components.v1.html(response_dict['text'], height=750)
+            st.session_state.edited_content = response_dict['text']
     
-    with edit:
-        st.write("...")
         
 def load_chat():
-    st.write("chat to be here")
+    # Function to generate text using the g4f client
+    def generate_text(prompt):
+        client = Client()
+        response = client.chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": prompt}],
+            provider=DarkAI
+        )
+        return response.choices[0].message.content
+
+    # Function to send prompt and get response
+    def send(prompt):
+        print('generating')
+        print(prompt)
+        for i in range(0, 10):
+            try:
+                system_prompt = f"""You are an HTML coding expert. Response with HTML code only, using user's code if provided. Always response with full code (User code and yours combined)."""
+                full_prompt = f"{system_prompt}\n{prompt}"
+                full_response = generate_text(full_prompt)
+                print(full_response)
+                return full_response
+            except Exception as e:
+                print(e)
+                pass
+        return "Error"
+    
+    # Initialize chat history
+    if "messages" not in st.session_state:
+        st.session_state.messages = []
+        
+    # Display chat messages from history on app rerun
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"])
+            
+    if prompt := st.chat_input("Page prompt"):
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        st.session_state.messages.append({"role": "user", "content": prompt})
+    
+        with st.chat_message("assistant"):
+            resp = st.write(send(prompt))
+        st.session_state.messages.append({"role": "assistant", "content": prompt})
+
+    
 
 if "box_wid" not in st.session_state:
-    st.session_state.box_wid = 30
+    st.session_state.box_wid = 40
 
 with st.sidebar.title("Additional questions"):
     st.write("Page configuration")
 
 st.title("WebWizz HTML generation engine")
 st.write("This is a web app that generates HTML code for web pages.")
-st.session_state.box_wid = st.slider(label="Resize page", min_value=0, max_value=40, value=st.session_state.box_wid)
+st.session_state.box_wid = st.slider(label="Resize page", label_visibility="collapsed", min_value=0, max_value=50, value=st.session_state.box_wid, help="Resize page")
 
-if st.session_state.box_wid == 40:
-    with st.container(border=True):
+if st.session_state.box_wid == 50:
+    with st.container(border=True, height=750):
         load_main()
 
 elif st.session_state.box_wid == 0:
-    with st.container(border=True):
+    with st.container(border=True, height=750):
         load_chat()
 
 
 else:
-    main, chat = st.columns([st.session_state.box_wid, 40 - st.session_state.box_wid])
+    main, chat = st.columns([st.session_state.box_wid, 50 - st.session_state.box_wid])
 
     with main:
-        with st.container(border=True):
+        with st.container(border=True, height=750):
             load_main()
 
     with chat:
-        with st.container(border=True):
+        with st.container(border=True, height=750):
             load_chat()
 
