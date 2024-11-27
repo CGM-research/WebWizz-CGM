@@ -1,11 +1,9 @@
 import streamlit as st
 import streamlit.components.v1 as components
 import json
-import streamlit as st
 from code_editor import code_editor
 import base64
 import sqlite3
-import streamlit.components.v1 as components
 import requests
 import difflib
 import re
@@ -20,8 +18,16 @@ st.set_page_config(
     initial_sidebar_state='collapsed'
 )
 
+if 'display' not in st.session_state:
+    st.session_state.display = True 
+
+def getcode (text):
+    pattern = r'```(.*?)```' 
+    matches = re.findall(pattern, text, re.DOTALL) 
+    return matches
+
 def load_main():
-    page_shop, edit, preview = st.tabs(["Page shop", "Edit code", "Preview"])
+    page_shop, edit = st.tabs(["Page shop", "Edit code"])
     with edit:
         # Define translations
         translations = {
@@ -226,9 +232,8 @@ def load_main():
         
         # Code Result Tab (conditionally rendered)
         if 'response_dict' in locals() and response_dict.get('type') == "submit":
-            st.header(translations[st.session_state.lang]['page_preview'])
-            st.components.v1.html(response_dict['text'], height=750)
-            st.session_state.edited_content = response_dict['text']
+            st.session_state.display = True
+            
     
         
 def load_chat():
@@ -248,7 +253,7 @@ def load_chat():
         print(prompt)
         for i in range(0, 10):
             try:
-                system_prompt = f"""You are an HTML coding expert. Response with HTML code only, using user's code if provided. Always response with full code (User code and yours combined)."""
+                system_prompt = f"""You are an HTML coding expert. Response with HTML code and explanations, using user's code if provided. Always response with full code (User code and yours combined). Always put code in ``` ``` """
                 full_prompt = f"{system_prompt}\n{prompt}"
                 full_response = generate_text(full_prompt)
                 print(full_response)
@@ -257,24 +262,43 @@ def load_chat():
                 print(e)
                 pass
         return "Error"
-    
+
     # Initialize chat history
     if "messages" not in st.session_state:
         st.session_state.messages = []
-        
-    # Display chat messages from history on app rerun
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
-            
+
+    # Display chat messages from history on app rerun with columns for each Q-A
+    if st.session_state.messages:
+        chat_expander = st.expander("Chat History")
+        with chat_expander:
+            for idx, message in enumerate(st.session_state.messages):
+                col1, col2 = st.columns([1, 1])
+                with col1:
+                    if message["role"] == "user":
+                        st.markdown(f"**Question {idx+1}:**")
+                        st.markdown(message["content"])
+                with col2:
+                    if message["role"] == "assistant":
+                        st.markdown(f"**Answer {idx+1}:**")
+                        st.markdown(message["content"])
+
     if prompt := st.chat_input("Page prompt"):
         with st.chat_message("user"):
             st.markdown(prompt)
         st.session_state.messages.append({"role": "user", "content": prompt})
-    
+        with st.status("AI is responding"):
+            response = send(prompt)
+
         with st.chat_message("assistant"):
-            resp = st.write(send(prompt))
-        st.session_state.messages.append({"role": "assistant", "content": prompt})
+            t1, t2 = st.tabs(["Code", "Explanation"])
+            with t1:
+                resp = st.markdown(response)
+                # Capture the response content
+                resp_content = response
+            with t2:
+                # Pass the captured content to getcode
+                code = st.code(getcode(resp_content))
+        st.session_state.messages.append({"role": "assistant", "content": response})
 
     
 
@@ -284,8 +308,7 @@ if "box_wid" not in st.session_state:
 with st.sidebar.title("Additional questions"):
     st.write("Page configuration")
 
-st.title("WebWizz HTML generation engine")
-st.write("This is a web app that generates HTML code for web pages.")
+st.title("WebWizz generation engine")
 st.session_state.box_wid = st.slider(label="Resize page", label_visibility="collapsed", min_value=0, max_value=50, value=st.session_state.box_wid, help="Resize page")
 
 if st.session_state.box_wid == 50:
@@ -307,4 +330,6 @@ else:
     with chat:
         with st.container(border=True, height=750):
             load_chat()
-
+if st.checkbox(label="Toogle to preview page"):
+    st.divider()
+    components.html(st.session_state.edited_content)
