@@ -10,14 +10,6 @@ import re
 from g4f.client import Client
 from g4f.Provider import DarkAI
 
-
-st.set_page_config(
-    page_title='page1',
-    page_icon='📋',
-    layout='wide',
-    initial_sidebar_state='collapsed'
-)
-
 if 'display' not in st.session_state:
     st.session_state.display = True 
 
@@ -224,7 +216,7 @@ def load_main():
         filename = st.text_input(label=translations[st.session_state.lang]['enter_filename'], key='filename2')
         if st.download_button(
             label=translations[st.session_state.lang]['export'],
-            data=st.session_state.get('edited_content', ''),
+            data=st.session_state.edited_content,
             file_name=filename,
             key="Download"
         ):
@@ -233,9 +225,7 @@ def load_main():
         # Code Result Tab (conditionally rendered)
         if 'response_dict' in locals() and response_dict.get('type') == "submit":
             st.session_state.display = True
-            
-    
-        
+
 def load_chat():
     # Function to generate text using the g4f client
     def generate_text(prompt):
@@ -253,8 +243,8 @@ def load_chat():
         print(prompt)
         for i in range(0, 10):
             try:
-                system_prompt = f"""You are an HTML coding expert. Response with HTML code and explanations, using user's code if provided. Always response with full code (User code and yours combined). Always put code in ``` ``` """
-                full_prompt = f"{system_prompt}\n{prompt}"
+                system_prompt = f"""You are an HTML coding expert. Response with HTML and CSS code only, using user's code if provided. Always respond with full code (User code and yours combined). Always add css ! Always respond with one code, which includes both html and css. Generate some text for website (Lorem ipsum), to make it look filled. ALWAYS Keep the format: Horizontal topbar, body, footer"""
+                full_prompt = f"{system_prompt}\n{st.session_state.edited_content}\n{prompt}\n{st.session_state['preferences']}"
                 full_response = generate_text(full_prompt)
                 print(full_response)
                 return full_response
@@ -267,20 +257,21 @@ def load_chat():
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Display chat messages from history on app rerun with columns for each Q-A
+    # Display chat messages from history on app rerun with tabs for each Q-A pair
     if st.session_state.messages:
         chat_expander = st.expander("Chat History")
         with chat_expander:
-            for idx, message in enumerate(st.session_state.messages):
-                col1, col2 = st.columns([1, 1])
-                with col1:
-                    if message["role"] == "user":
-                        st.markdown(f"**Question {idx+1}:**")
-                        st.markdown(message["content"])
-                with col2:
-                    if message["role"] == "assistant":
-                        st.markdown(f"**Answer {idx+1}:**")
-                        st.markdown(message["content"])
+            for idx in range(0, len(st.session_state.messages), 2):
+                if idx+1 < len(st.session_state.messages):
+                    tabs = st.tabs([f"Q{idx//2 + 1}", f"A{idx//2 + 1}"])
+                    with tabs[0]:
+                        with st.chat_message("user"):
+                            st.markdown(f"**Question {idx//2 + 1}:**")
+                            st.markdown(st.session_state.messages[idx]["content"])
+                    with tabs[1]:
+                        with st.chat_message("assistant"):
+                            st.markdown(f"**Answer {idx//2 + 1}:**")
+                            st.markdown(st.session_state.messages[idx + 1]["content"])
 
     if prompt := st.chat_input("Page prompt"):
         with st.chat_message("user"):
@@ -300,13 +291,130 @@ def load_chat():
                 code = st.code(getcode(resp_content))
         st.session_state.messages.append({"role": "assistant", "content": response})
 
-    
-
 if "box_wid" not in st.session_state:
     st.session_state.box_wid = 40
 
-with st.sidebar.title("Additional questions"):
-    st.write("Page configuration")
+with st.sidebar:
+    st.divider()
+    st.title("Additional questions")
+    
+    # Function to collect user preferences and save to session state
+    def save_preferences(preferences):
+        st.session_state['preferences'] = preferences
+
+    # Initialize an empty dictionary to store preferences
+    preferences = {}
+
+    # Layout selection
+    layout = st.selectbox(
+        "Select Layout Style",
+        ["", "Fixed-width", "Fluid/Responsive"]
+    )
+    if layout:
+        preferences["Layout Style"] = layout
+
+    # Navigation style
+    navigation = st.selectbox(
+        "Select Navigation Style",
+        ["", "Horizontal", "Vertical", "Sticky/Fixed", "Scrollable"]
+    )
+    if navigation:
+        preferences["Navigation Style"] = navigation
+
+    # Color scheme
+    color_scheme = st.pills(
+        "Choose Color Scheme",
+        ["Light", "Dark", "Custom"]
+    )
+    if color_scheme:
+        preferences["Color Scheme"] = color_scheme
+        if color_scheme == "Custom":
+            color = st.text_area(label="Describe color scheme")
+            st.color_picker(label="RGB color picker", help="Doesn't apply automatically !")
+
+    # Typography
+    typography = st.selectbox(
+        "Select Typography Style",
+        ["", "Serif", "Sans-serif", "Custom Fonts", "Standard Web-safe Fonts"]
+    )
+    if typography:
+        preferences["Typography"] = typography
+
+    # Imagery and Media
+    imagery = st.selectbox(
+        "Imagery Preferences",
+        ["", "Full-width Images", "Contained Images", "Background Images", "Solid Colors", "Icons/Illustrations"]
+    )
+    if imagery:
+        preferences["Imagery"] = imagery
+
+    # CSS Frameworks
+    css_framework = st.selectbox(
+        "CSS Framework Preference",
+        ["", "Bootstrap", "Foundation", "Bulma", "Custom CSS"]
+    )
+    if css_framework:
+        preferences["CSS Framework"] = css_framework
+
+    # Grid System
+    grid_system = st.selectbox(
+        "Preferred Grid System",
+        ["", "Flexbox", "CSS Grid", "Other"]
+    )
+    if grid_system:
+        preferences["Grid System"] = grid_system
+
+    # Animations and Interactions
+    animations = st.multiselect(
+        "Select Animations and Interactions",
+        ["CSS Animations", "JavaScript Interactions", "Hover Effects", "Scrolling Animations", "Transitions"]
+    )
+    if animations:
+        preferences["Animations and Interactions"] = animations
+
+    # Form styles
+    form_styles = st.selectbox(
+        "Form Element Styles",
+        ["", "Standard", "Rounded Corners", "Sharp Corners", "Flat Design", "Gradients/Shadows"]
+    )
+    if form_styles:
+        preferences["Form Styles"] = form_styles
+
+    # Accessibility
+    accessibility = st.selectbox(
+        "Accessibility Features",
+        ["", "Standard", "High Contrast", "Keyboard Navigation", "Screen Reader Compatible"]
+    )
+    if accessibility:
+        preferences["Accessibility"] = accessibility
+
+    # Responsive design
+    responsive_design = st.selectbox(
+        "Responsive Design Approach",
+        ["", "Mobile-first", "Desktop-first"]
+    )
+    if responsive_design:
+        preferences["Responsive Design"] = responsive_design
+        
+    additional_data = st.text_area(label="Additional preferences")
+    
+    if additional_data:
+        preferences["Additional Preferences"] = additional_data
+
+    # Save preferences when button is clicked
+    if st.button("Save Preferences"):
+        save_preferences(preferences)
+        st.success("Preferences saved successfully!")
+
+    # Display current configuration
+    if st.button("Display Current Configuration"):
+        if 'preferences' in st.session_state:
+            st.json(st.session_state['preferences'])
+        else:
+            st.warning("No preferences saved yet!")
+
+
+
 
 st.title("WebWizz generation engine")
 st.session_state.box_wid = st.slider(label="Resize page", label_visibility="collapsed", min_value=0, max_value=50, value=st.session_state.box_wid, help="Resize page")
@@ -330,6 +438,8 @@ else:
     with chat:
         with st.container(border=True, height=750):
             load_chat()
+            
+st.write("<~~ Configure page here")
 if st.checkbox(label="Toogle to preview page"):
     st.divider()
     components.html(st.session_state.edited_content)

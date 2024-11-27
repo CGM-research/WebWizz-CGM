@@ -23,7 +23,7 @@ if 'edited_content' not in st.session_state:
 # Define translations
 translations = {
     'en': {
-        'language_selection': "Language selection",
+        'language_selection': "Language",
         'to_be_implemented': "To be implemented ...",
         'navigation': "Navigation",
         'pages': "Pages: ",
