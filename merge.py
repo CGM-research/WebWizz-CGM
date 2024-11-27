@@ -36,9 +36,9 @@ def parse_tag(path, tag):
 
 def merge_html_files(header_file_path, body_file_path):
     html_body = parse_tag(header_file_path, "body") + parse_tag(body_file_path, "body")
-    print("HTML BODY: ", html_body)
+    #print("HTML BODY: ", html_body)
     html_style = parse_tag(header_file_path, "style") + parse_tag(body_file_path, "style")
-    print("HTML STYLE: ", html_style)
+    #print("HTML STYLE: ", html_style)
     print("merging")
     
     html_page = format_html(f"""
