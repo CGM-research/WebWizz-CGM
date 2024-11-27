@@ -8,7 +8,7 @@ import requests
 import difflib
 import re
 from g4f.client import Client
-from g4f.Provider import DarkAI
+from g4f.Provider import *
 
 if 'display' not in st.session_state:
     st.session_state.display = True 
@@ -213,10 +213,13 @@ def load_main():
         ace_props = {"style": {"borderRadius": "0px 0px 8px 8px"}}
         response_dict = code_editor(code=st.session_state.edited_content, height=st.session_state.height, lang=st.session_state.language, theme=st.session_state.theme, shortcuts=st.session_state.shortcuts, focus=st.session_state.focus, buttons=btns, info=info_bar, props=ace_props, options={"wrap": st.session_state.wrap}, allow_reset=True, key="code_editor_demo")    
 
+        def get_download_data():
+            return st.session_state.edited_content
+
         filename = st.text_input(label=translations[st.session_state.lang]['enter_filename'], key='filename2')
         if st.download_button(
             label=translations[st.session_state.lang]['export'],
-            data=st.session_state.edited_content,
+            data=get_download_data(),
             file_name=filename,
             key="Download"
         ):
@@ -233,7 +236,7 @@ def load_chat():
         response = client.chat.completions.create(
             model="gpt-4o",
             messages=[{"role": "user", "content": prompt}],
-            provider=DarkAI
+            provider=DDG
         )
         return response.choices[0].message.content
 
@@ -305,101 +308,163 @@ with st.sidebar:
     # Initialize an empty dictionary to store preferences
     preferences = {}
 
-    # Layout selection
-    layout = st.selectbox(
-        "Select Layout Style",
-        ["", "Fixed-width", "Fluid/Responsive"]
-    )
-    if layout:
-        preferences["Layout Style"] = layout
-
-    # Navigation style
-    navigation = st.selectbox(
-        "Select Navigation Style",
-        ["", "Horizontal", "Vertical", "Sticky/Fixed", "Scrollable"]
-    )
-    if navigation:
-        preferences["Navigation Style"] = navigation
-
-    # Color scheme
-    color_scheme = st.pills(
-        "Choose Color Scheme",
-        ["Light", "Dark", "Custom"]
-    )
-    if color_scheme:
-        preferences["Color Scheme"] = color_scheme
-        if color_scheme == "Custom":
-            color = st.text_area(label="Describe color scheme")
-            st.color_picker(label="RGB color picker", help="Doesn't apply automatically !")
-
-    # Typography
-    typography = st.selectbox(
-        "Select Typography Style",
-        ["", "Serif", "Sans-serif", "Custom Fonts", "Standard Web-safe Fonts"]
-    )
-    if typography:
-        preferences["Typography"] = typography
-
-    # Imagery and Media
-    imagery = st.selectbox(
-        "Imagery Preferences",
-        ["", "Full-width Images", "Contained Images", "Background Images", "Solid Colors", "Icons/Illustrations"]
-    )
-    if imagery:
-        preferences["Imagery"] = imagery
-
-    # CSS Frameworks
-    css_framework = st.selectbox(
-        "CSS Framework Preference",
-        ["", "Bootstrap", "Foundation", "Bulma", "Custom CSS"]
-    )
-    if css_framework:
-        preferences["CSS Framework"] = css_framework
-
-    # Grid System
-    grid_system = st.selectbox(
-        "Preferred Grid System",
-        ["", "Flexbox", "CSS Grid", "Other"]
-    )
-    if grid_system:
-        preferences["Grid System"] = grid_system
-
-    # Animations and Interactions
-    animations = st.multiselect(
-        "Select Animations and Interactions",
-        ["CSS Animations", "JavaScript Interactions", "Hover Effects", "Scrolling Animations", "Transitions"]
-    )
-    if animations:
-        preferences["Animations and Interactions"] = animations
-
-    # Form styles
-    form_styles = st.selectbox(
-        "Form Element Styles",
-        ["", "Standard", "Rounded Corners", "Sharp Corners", "Flat Design", "Gradients/Shadows"]
-    )
-    if form_styles:
-        preferences["Form Styles"] = form_styles
-
-    # Accessibility
-    accessibility = st.selectbox(
-        "Accessibility Features",
-        ["", "Standard", "High Contrast", "Keyboard Navigation", "Screen Reader Compatible"]
-    )
-    if accessibility:
-        preferences["Accessibility"] = accessibility
-
-    # Responsive design
-    responsive_design = st.selectbox(
-        "Responsive Design Approach",
-        ["", "Mobile-first", "Desktop-first"]
-    )
-    if responsive_design:
-        preferences["Responsive Design"] = responsive_design
-        
-    additional_data = st.text_area(label="Additional preferences")
+    bas, adv = st.tabs(["Basic", "Advanced"])
     
-    if additional_data:
-        preferences["Additional Preferences"] = additional_data
+    with bas:
+        # **Basic User Questions**
+        st.header("Basic User Questions")
+        
+        # Layout selection
+        layout = st.selectbox(
+            "Select Layout Style",
+            ["", "Fixed-width", "Fluid/Responsive"]
+        )
+        if layout:
+            preferences["Layout Style"] = layout
+
+        # Navigation style
+        navigation = st.selectbox(
+            "Select Navigation Style",
+            ["", "Horizontal", "Vertical"]
+        )
+        if navigation:
+            preferences["Navigation Style"] = navigation
+
+        # Custom Color scheme
+        custom_color_scheme = st.selectbox(
+            "Choose Custom Color Scheme",
+            ["Light", "Dark", "Custom"],
+            key="bas_key_color"
+        )
+        if custom_color_scheme:
+            preferences["Custom Color Scheme"] = custom_color_scheme
+            if custom_color_scheme == "Custom":
+                color = st.text_area(label="Describe color scheme")
+                st.color_picker(label="RGB color picker", help="Doesn't apply automatically!")
+        # Typography
+        typography = st.selectbox(
+            "Select Typography Style",
+            ["", "Serif", "Sans-serif"]
+        )
+        if typography:
+            preferences["Typography"] = typography
+
+        # Imagery and Media
+        imagery = st.selectbox(
+            "Imagery Preferences",
+            ["", "Full-width Images", "Contained Images"]
+        )
+        if imagery:
+            preferences["Imagery"] = imagery
+            
+        additional_data = st.text_area(label="Additional preferences", key="basic")
+        
+        if additional_data:
+            preferences["Additional Preferences"] = additional_data
+
+        # Additional questions for basic users
+        st.text_area("Enter your website's primary purpose", key="website_purpose")
+        st.slider("Preferred font size", 10, 24, 14)
+
+    with adv:
+        # **Advanced User Questions**
+        st.header("Advanced User Questions")
+        
+        # Layout selection
+        advanced_layout = st.selectbox(
+            "Select Advanced Layout Style",
+            ["", "Fixed-width", "Fluid/Responsive", "Custom"]
+        )
+        if advanced_layout:
+            preferences["Advanced Layout Style"] = advanced_layout
+
+        # Navigation style
+        advanced_navigation = st.selectbox(
+            "Select Advanced Navigation Style",
+            ["", "Horizontal", "Vertical", "Sticky/Fixed", "Scrollable"]
+        )
+        if advanced_navigation:
+            preferences["Advanced Navigation Style"] = advanced_navigation
+
+        # Custom Color scheme
+        custom_color_scheme = st.selectbox(
+            "Choose Custom Color Scheme",
+            ["Light", "Dark", "Custom"]
+        )
+        if custom_color_scheme:
+            preferences["Custom Color Scheme"] = custom_color_scheme
+            if custom_color_scheme == "Custom":
+                color = st.text_area(label="Describe color scheme")
+                st.color_picker(label="RGB color picker", help="Doesn't apply automatically!")
+
+        # Advanced Typography
+        advanced_typography = st.selectbox(
+            "Select Advanced Typography Style",
+            ["", "Serif", "Sans-serif", "Custom Fonts", "Standard Web-safe Fonts"]
+        )
+        if advanced_typography:
+            preferences["Advanced Typography"] = advanced_typography
+
+        # Advanced Imagery and Media
+        advanced_imagery = st.selectbox(
+            "Advanced Imagery Preferences",
+            ["", "Full-width Images", "Contained Images", "Background Images", "Solid Colors", "Icons/Illustrations"]
+        )
+        if advanced_imagery:
+            preferences["Advanced Imagery"] = advanced_imagery
+
+        # CSS Frameworks
+        css_framework = st.selectbox(
+            "CSS Framework Preference",
+            ["", "Bootstrap", "Foundation", "Bulma", "Custom CSS"]
+        )
+        if css_framework:
+            preferences["CSS Framework"] = css_framework
+
+        # Grid System
+        grid_system = st.selectbox(
+            "Preferred Grid System",
+            ["", "Flexbox", "CSS Grid", "Other"]
+        )
+        if grid_system:
+            preferences["Grid System"] = grid_system
+
+        # Animations and Interactions
+        animations = st.multiselect(
+            "Select Animations and Interactions",
+            ["CSS Animations", "JavaScript Interactions", "Hover Effects", "Scrolling Animations", "Transitions"]
+        )
+        if animations:
+            preferences["Animations and Interactions"] = animations
+
+        # Form styles
+        form_styles = st.selectbox(
+            "Form Element Styles",
+            ["", "Standard", "Rounded Corners", "Sharp Corners", "Flat Design", "Gradients/Shadows"]
+        )
+        if form_styles:
+            preferences["Form Styles"] = form_styles
+
+        # Accessibility
+        accessibility = st.selectbox(
+            "Accessibility Features",
+            ["", "Standard", "High Contrast", "Keyboard Navigation", "Screen Reader Compatible"]
+        )
+        if accessibility:
+            preferences["Accessibility"] = accessibility
+
+        # Responsive design
+        responsive_design = st.selectbox(
+            "Responsive Design Approach",
+            ["", "Mobile-first", "Desktop-first"]
+        )
+        if responsive_design:
+            preferences["Responsive Design"] = responsive_design
+            
+        additional_data = st.text_area(label="Additional preferences", key="Key_add_adv")
+        
+        if additional_data:
+            preferences["Additional Preferences"] = additional_data
 
     # Save preferences when button is clicked
     if st.button("Save Preferences"):
@@ -412,6 +477,7 @@ with st.sidebar:
             st.json(st.session_state['preferences'])
         else:
             st.warning("No preferences saved yet!")
+
 
 
 
